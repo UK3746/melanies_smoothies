@@ -7,7 +7,7 @@ import pandas as pd
 
 # Define Snowflake connection parameters
 connection_parameters = {
-    "account": "JPSGWSJ-OXB72419",
+   "account": "JPSGWSJ-OXB72419",
     "user": "UK",
     "password": "myBestRM@12345",
     "role": "SYSADMIN",
@@ -42,6 +42,9 @@ try:
         max_selections=5
     )
 
+    # Initialize ingredients_string to handle case where no ingredients are selected
+    ingredients_string = ''
+    
     if ingredients_list:
         ingredients_string = ', '.join(ingredients_list)
         
@@ -58,18 +61,21 @@ try:
             except requests.RequestException as e:
                 st.error(f"Failed to fetch data for {fruit}: {e}")
     
-    my_insert_stmt = f"""
-    INSERT INTO smoothies.public.orders (ingredients, name_on_order)
-    VALUES ('{ingredients_string}', '{name_on_order}')
-    """
-    
-    time_to_insert = st.button('Submit Order')
-    if time_to_insert:
-        try:
-            session.sql(my_insert_stmt).collect()
-            st.success(f'Your Smoothie is ordered, {name_on_order}!', icon="✅")
-        except Exception as e:
-            st.error(f"Failed to place order: {e}")
+    if ingredients_string:  # Only prepare the SQL statement if ingredients_string is not empty
+        my_insert_stmt = f"""
+        INSERT INTO smoothies.public.orders (ingredients, name_on_order)
+        VALUES ('{ingredients_string}', '{name_on_order}')
+        """
+        
+        time_to_insert = st.button('Submit Order')
+        if time_to_insert:
+            try:
+                session.sql(my_insert_stmt).collect()
+                st.success(f'Your Smoothie is ordered, {name_on_order}!', icon="✅")
+            except Exception as e:
+                st.error(f"Failed to place order: {e}")
+    else:
+        st.info("Please select at least one ingredient before submitting your order.")
 
 except Exception as e:
     st.error(f"An error occurred: {e}")
