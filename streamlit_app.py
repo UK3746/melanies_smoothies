@@ -51,8 +51,8 @@ try:
              search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit, 'SEARCH_ON'].iloc[0]
              st.write('The search value for ', fruit,' is ', search_on, '.')
 
-            st.subheader(f'{fruit} Nutrition Information')
-            # Handle Fruityvice API request
+             st.subheader(f'{fruit} Nutrition Information')
+             # Handle Fruityvice API request
             try:
                 fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit}")
                 fruit_info = fruityvice_response.json()
