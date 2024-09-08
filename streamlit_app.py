@@ -2,17 +2,17 @@ import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
 import requests
-import pandas as pd
+import pandas as pd_df
 
 # Define Snowflake connection parameters
 connection_parameters = {
-    "account": "<your_account>",
-    "user": "<your_user>",
-    "password": "<your_password>",
-    "role": "<your_role>",
-    "warehouse": "<your_warehouse>",
-    "database": "<your_database>",
-    "schema": "<your_schema>"
+    "account": "JPSGWSJ-OXB72419",
+    "user": "UK",
+    "password": "myBestRM@12345",
+    "role": "SYSADMIN",
+    "warehouse": "COMPUTE_WH",
+    "database": "SMOOTHIES",
+    "schema": "SMOOTHIES.PUBLIC"
 }
 
 # Function to create and cache Snowpark session
@@ -32,9 +32,11 @@ st.write('The name on your Smoothie will be:', name_on_order)
 
 try:
     # Fetch data from Snowflake
-    my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME")).to_pandas()
+    my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON")).to_pandas()
     st.dataframe(data=my_dataframe, use_container_width=True)
 
+    pd_df = my_dataframe.to_pandas()
+    
     ingredients_list = st.multiselect(
         'Choose up to 5 ingredients:',
         options=my_dataframe["FRUIT_NAME"].tolist(),
@@ -45,6 +47,10 @@ try:
         ingredients_string = ', '.join(ingredients_list)
         
         for fruit in ingredients_list:
+
+             search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit, 'SEARCH_ON'].iloc[0]
+             st.write('The search value for ', fruit,' is ', search_on, '.')
+
             st.subheader(f'{fruit} Nutrition Information')
             # Handle Fruityvice API request
             try:
