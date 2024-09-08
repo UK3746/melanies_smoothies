@@ -1,6 +1,7 @@
 import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
+import requests
 
 # Define your Snowflake connection parameters
 connection_parameters = {
@@ -40,11 +41,15 @@ try:
     
     if ingredients_list:
         ingredients_string = ', '.join(ingredients_list)
-
         my_insert_stmt = f"""
         INSERT INTO smoothies.public.orders (ingredients, name_on_order)
         VALUES ('{ingredients_string}', '{name_on_order}')
         """
+        
+        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+        #st.text(fruityvice_response.json())
+        fv_df = st.dataframe(data=fruityvice_response.json(),use_container_width=True)
+
 
         time_to_insert = st.button('Submit Order')
         if time_to_insert:
@@ -53,9 +58,3 @@ try:
             
 except Exception as e:
     st.error(f"An error occurred: {e}")
-
-
-import requests
-fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
-#st.text(fruityvice_response.json())
-fv_df = st.dataframe(data=fruityvice_response.json(),use_container_width=True)
