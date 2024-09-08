@@ -32,14 +32,14 @@ st.write('The name on your Smoothie will be:', name_on_order)
 
 try:
     # Fetch data from Snowflake
-    DataFrame = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON")).to_pandas()
-    st.DataFrame(data=DataFrame, use_container_width=True)
+    my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON")).to_pandas()
+    st.my_dataframe(data=my_dataframe, use_container_width=True)
 
-    pd_df = DataFrame.to_pandas()
+    pd_df = my_dataframe.to_pandas()
     
     ingredients_list = st.multiselect(
         'Choose up to 5 ingredients:',
-        options=DataFrame["FRUIT_NAME"].tolist(),
+        options=my_dataframe["FRUIT_NAME"].tolist(),
         max_selections=5
     )
     
@@ -56,9 +56,9 @@ try:
              try:
                 fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit}")
                 fruit_info = fruityvice_response.json()
-                # Display API response as a dataframe
-                fruit_df = pd.DataFrame(fruit_info, index=[0])
-                st.dataframe(fruit_df, use_container_width=True)
+                # Display API response as a my_dataframe
+                fruit_df = pd.my_dataframe(fruit_info, index=[0])
+                st.my_dataframe(fruit_df, use_container_width=True)
              except requests.RequestException as e:
                 st.error(f"Failed to fetch data for {fruit}: {e}")
 
