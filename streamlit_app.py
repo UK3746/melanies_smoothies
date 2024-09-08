@@ -3,6 +3,7 @@ from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
 import requests
 import pandas as pd_df
+import numpy
 
 # Define Snowflake connection parameters
 connection_parameters = {
