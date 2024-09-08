@@ -3,7 +3,7 @@ from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
 import requests
 import pandas as pd_df
-import numpy
+
 
 # Define Snowflake connection parameters
 connection_parameters = {
@@ -13,7 +13,7 @@ connection_parameters = {
     "role": "SYSADMIN",
     "warehouse": "COMPUTE_WH",
     "database": "SMOOTHIES",
-    "schema": "SMOOTHIES.PUBLIC"
+    "schema": "PUBLIC"
 }
 
 # Function to create and cache Snowpark session
@@ -33,8 +33,9 @@ st.write('The name on your Smoothie will be:', name_on_order)
 
 try:
     # Fetch data from Snowflake
-    my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON"))
+    my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON")).to_pandas()
     st.my_dataframe(data=my_dataframe, use_container_width=True)
+    st.stop()
 
     pd_df = my_dataframe.to_pandas()
     
