@@ -53,13 +53,13 @@ try:
 
              st.subheader(f'{fruit} Nutrition Information')
              # Handle Fruityvice API request
-            try:
+             try:
                 fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit}")
                 fruit_info = fruityvice_response.json()
                 # Display API response as a dataframe
                 fruit_df = pd.DataFrame(fruit_info, index=[0])
                 st.dataframe(fruit_df, use_container_width=True)
-            except requests.RequestException as e:
+             except requests.RequestException as e:
                 st.error(f"Failed to fetch data for {fruit}: {e}")
 
     # SQL insert statement
