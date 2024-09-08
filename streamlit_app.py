@@ -7,7 +7,7 @@ connection_parameters = {
     "account": "JPSGWSJ-OXB72419",
     "user": "UK",
     "password": "myBestRM@12345",
-    "role":SYSADMIN",
+    "role": "SYSADMIN",
     "warehouse": "COMPUTE_WH",
     "database":  "SMOOTHIES",
     "schema":  "PUBLIC"
