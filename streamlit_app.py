@@ -41,8 +41,8 @@ try:
     
     if ingredients_list:
         ingredients_string = ', '.join(ingredients_list)
-        st.subheader(', '.join(ingredients_list) + 'Nutrition Information')
-        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/', '.join(ingredients_list)")
+        st.subheader(ingredients_list + 'Nutrition Information')
+        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/ingredients_list")
         #st.text(fruityvice_response.json())
         fv_df = st.dataframe(data=fruityvice_response.json(),use_container_width=True)
         my_insert_stmt = f"""
