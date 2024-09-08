@@ -32,14 +32,14 @@ st.write('The name on your Smoothie will be:', name_on_order)
 
 try:
     # Fetch data from Snowflake
-    my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON")).to_pandas()
-    #st.dataframe(data=my_dataframe, use_container_width=True)
+    my_DataFrame = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON")).to_pandas()
+    st.my_DataFrame(data=my_DataFrame, use_container_width=True)
 
-    pd_df = my_dataframe.to_pandas()
+    pd_df = my_DataFrame.to_pandas()
     
     ingredients_list = st.multiselect(
         'Choose up to 5 ingredients:',
-        options=my_dataframe["FRUIT_NAME"].tolist(),
+        options=my_DataFrame["FRUIT_NAME"].tolist(),
         max_selections=5
     )
     
