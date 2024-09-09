@@ -1,82 +1,65 @@
+# Import python packages
 import streamlit as st
-from snowflake.snowpark import Session
+from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark import session
 from snowflake.snowpark.functions import col
 import requests
 import pandas as pd_df
 
-
-# Define Snowflake connection parameters
-connection_parameters = {
-    "account": "JPSGWSJ-OXB72419",
-    "user": "UK",
-    "password": "myBestRM@12345",
-    "role": "SYSADMIN",
-    "warehouse": "COMPUTE_WH",
-    "database": "SMOOTHIES",
-    "schema": "PUBLIC"
-}
-
-# Function to create and cache Snowpark session
-@st.cache_resource
-def create_session():
-    return Session.builder.configs(connection_parameters).create()
-
-# Create Snowpark session
-session = create_session()
-
-# Streamlit app components
+# Write directly to the app
 st.title(":cup_with_straw: Customize Your Smoothie :cup_with_straw:")
-st.write("Choose the fruits you want in your custom Smoothie")
+st.write(
+    """ Choose the fruits you want in your custom Smoothie """
+)
+
 
 name_on_order = st.text_input('Name on Smoothie:')
 st.write('The name on your Smoothie will be:', name_on_order)
 
-try:
-    # Fetch data from Snowflake
-    my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON")).to_pandas()
-    st.my_dataframe(data=my_dataframe, use_container_width=True)
-    st.stop()
 
-    pd_df = my_dataframe.to_pandas()
+
+session = get_active_session()
+my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON"))
+st.dataframe(data=my_dataframe, use_container_width=True)
+#st.stop()
+
+
+pd_df = my_dataframe.to_pandas()
+#st.dataframe(pd_df)
+#st.stop()
+
+ingredients_list = st.multiselect(
+    'Choose up to 5 ingredients:'
+    , my_dataframe
+    , max_selections = 5
+)
+if ingredients_list:
+    ingredients_string = ''
     
-    ingredients_list = st.multiselect(
-        'Choose up to 5 ingredients:',
-        options=my_dataframe["FRUIT_NAME"].tolist(),
-        max_selections=5
-    )
+    for fruit_choosen in ingredients_list:
+        ingredients_string += fruit_choosen +' '
+
+        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_choosen, 'SEARCH_ON'].iloc[0]
+        st.write('The search value for ', fruit_choosen,' is ', search_on, '.')
+
+
+        st.subheader( fruit_choosen + 'Nutrition Information')
+        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_choosen)
+        fv_df = st.dataframe(data=fruityvice_response.json(),use_container_width=True)
+
+
+
+    #st.write(ingredients_string)
     
-    if ingredients_list:
-        ingredients_string = ', '.join(ingredients_list)
-        
-        for fruit in ingredients_list:
+ 
+my_insert_stmt = """ insert into smoothies.public.orders(ingredients,name_on_order)
+            values ('""" + ingredients_string + """','""" + name_on_order + """')"""
 
-             search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit, 'SEARCH_ON'].iloc[0]
-             st.write('The search value for ', fruit,' is ', search_on, '.')
+#st.write(my_insert_stmt)
 
-             st.subheader(f'{fruit} Nutrition Information')
-             # Handle Fruityvice API request
-             try:
-                fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit}")
-                fruit_info = fruityvice_response.json()
-                # Display API response as a my_dataframe
-                fruit_df = pd.my_dataframe(fruit_info, index=[0])
-                st.my_dataframe(fruit_df, use_container_width=True)
-             except requests.RequestException as e:
-                st.error(f"Failed to fetch data for {fruit}: {e}")
-
-    # SQL insert statement
-    my_insert_stmt = f"""
-    INSERT INTO smoothies.public.orders (ingredients, name_on_order)
-    VALUES ('{ingredients_string}', '{name_on_order}')
-    """
+time_to_insert = st.button('Submit Order')
+if time_to_insert:
+    session.sql(my_insert_stmt).collect()
     
-    time_to_insert = st.button('Submit Order')
-    if time_to_insert:
-        try:
-            session.sql(my_insert_stmt).collect()
-            st.success(f'Your Smoothie is ordered, {name_on_order}!', icon="✅")
-        except Exception as e:
-            st.error(f"Failed to place order: {e}")
-
-except Exception as e:
-    st.error(f"An error occurred: {e}")
+    
+    st.success('Your Smoothie is ordered,'+name_on_order+'!', icon="✅")
