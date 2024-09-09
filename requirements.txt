@@ -3,3 +3,4 @@ snowflake-connector-python
 snowflake-snowpark-python
 streamlit
 requests
+pandas
