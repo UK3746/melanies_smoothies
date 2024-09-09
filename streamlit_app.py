@@ -6,13 +6,13 @@ import pandas as pd
 
 # Snowflake connection parameters
 snowflake_config = {
-    "account": "<your_account>",
-    "user": "<your_username>",
-    "password": "<your_password>",
-    "role": "<your_role>",
-    "warehouse": "<your_warehouse>",
-    "database": "<your_database>",
-    "schema": "<your_schema>"
+    "account": "JPSGWSJ-OXB72419",
+    "user": "UK",
+    "password": "myBestRM@12345",
+    "role": "SYSADMIN",
+    "warehouse": "COMPUTE_WH",
+    "database": "SMOOTHIES",
+    "schema": "PUBLIC"
 }
 
 # Initialize Snowflake session
